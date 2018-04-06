@@ -80,7 +80,10 @@ switch params.dataset
         params.N = n;
         params.size = [h w];
         params.pix = h * w;
-        params.G = randn(params.pix, params.H);
+        % Initialize projective fields with PCA
+        C = cov(data');
+        [V, ~] = eig(C);
+        params.G = V(:, 1:params.H);
 end
 
 end
