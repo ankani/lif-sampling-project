@@ -1,5 +1,5 @@
 % Computes the gradients of log (p/q) w.r.t RFs (G), pixelwise noise (sigma_stim) and Prior probability of spiking (prior)
-function [G_grad,sig_grad,pr_grad,G_grad_vb, sig_grad_vb, pr_grad_vb] = compute_gradients_elbo(params,mu_vb,stim,z_hidden)
+function [G_grad,sig_grad,pr_grad,G_grad_vb, sig_grad_vb, pr_grad_vb,det_zero] = compute_gradients_elbo(params,mu_vb,stim,z_hidden)
 stim = stim(:);
 z = z_hidden(:);
 diff = stim - params.G * z;
@@ -10,7 +10,7 @@ dlogP_dsig = diff' * diff / params.sigma_stim^3 - params.pix^2 / params.sigma_st
 dlogP_dpr = sum(z) / params.prior - sum(1 - z) / (1 - params.prior);
 
 % Gradients of log q
-[G_grad_vb, sig_grad_vb, pr_grad_vb] = LearningParams.compute_gradients_vb(params,mu_vb,stim,z_hidden);
+[G_grad_vb, sig_grad_vb, pr_grad_vb, det_zero] = LearningParams.compute_gradients_vb(params,mu_vb,stim,z_hidden);
 
 % ELBO gradients are difference of logP and logQ gradients
 G_grad = dlogP_dG - G_grad_vb;

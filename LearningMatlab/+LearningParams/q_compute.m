@@ -4,6 +4,6 @@ function p = q_compute(params,z_hidden,pr)
 p = 1.0;
 N = params.Neurons_hidden;
 for i = 1:N
-    p = p * (pr(i))^(z_hidden(i)) * (1.0 - pr(i))^(1 - z_hidden(i)) ;
+    p = p * sign(pr(i))*abs(pr(i))^(z_hidden(i)) * sign(1.0 - pr(i))*abs(1.0 - pr(i))^(1 - z_hidden(i)) ;
 end
 end

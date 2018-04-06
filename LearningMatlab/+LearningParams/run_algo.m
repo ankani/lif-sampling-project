@@ -3,30 +3,34 @@
 % and params.prior will be prior probability of neurons firing
 % This code is Parallelized for each data point in the batch
 function params  = run_algo(params,varargin)
-G_old = params.G;
+
 sigma_stim_old = params.sigma_stim;
 prior_old = params.prior;
 G_grad_data = zeros(params.pix^2,params.Neurons_hidden);
 sig_grad_data = 0.0;
 pr_grad_data = 0.0;
-iterations = 0;
+iterations = 1;
 if ~isempty(varargin)
     data = varargin{1};
 else
     data = params.data;
 end
+% params.G = repmat(mean(data)',1,params.Neurons_hidden);
+G_old = params.G;
 batch = params.batch;
 stim_fix = data(10,:);
 elbo_track = [];
-f = figure(1);
-get(f)
 while iterations<=params.max_iter
     disp(iterations);
     params.eta = 0.001/(sqrt(iterations));
-    for d_pt = 1:batch
+    for d_pt = 1:5
         stim = data(d_pt,:);
         mu = LearningParams.variational_bayes(params,stim);
-        [gr_G,gr_sig,gr_pr,G_vb_avg,s_vb_avg,pr_vb_avg,norm_wt] = LearningParams.Each_Data(params,stim,mu);
+        mu(mu<0.001) = 0.001;
+        if sum(isnan(mu))>0
+            keyboard
+        end
+        [gr_G,gr_sig,gr_pr,G_vb_avg,s_vb_avg,pr_vb_avg,norm_wt,~] = LearningParams.Each_Data(params,stim,mu);
         if isnan(gr_G)==0 & isinf(gr_G)==0
             G_grad_data = G_grad_data + gr_G / norm_wt + log(norm_wt / params.K_samples) * G_vb_avg;
         end
@@ -56,20 +60,19 @@ while iterations<=params.max_iter
         disp('Maximum Iteration Reached');
     end
     
-    if mod(iterations,5) == 0
-        s = 0;
-        mu_test = LearningParams.variational_bayes(params,stim_fix);
-        for t=1:params.K_samples
-          z = binornd(1,mu_test', params.Neurons_hidden,1);  
-          s = s + log(LearningParams.prob(params,stim_fix,z)/LearningParams.q_compute(params,z,mu_test));
-        end
-        s = s / params.K_samples;
-        elbo_track(end+1) = s;
-        drawnow;
-        plot((1:length(elbo_track))*5,elbo_track);
-        hold on;
+    
+    s = 0;
+    mu_test = LearningParams.variational_bayes(params,stim_fix);
+    for t=1:params.K_samples
+        z = binornd(1,mu_test', params.Neurons_hidden,1);
+        s = s + log(LearningParams.prob(params,stim_fix,z)/LearningParams.q_compute(params,z,mu_test));
     end
+    s = s / params.K_samples;
+    elbo_track(end+1) = s;
     
 end
+plot((1:length(elbo_track)),elbo_track,'o-');
+disp(elbo_track)
+
 end
 

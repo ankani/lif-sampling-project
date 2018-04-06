@@ -9,20 +9,25 @@ function params = ModelParams(filename,varargin)
 %
 params = struct(...
     'save_dir', fullfile('+LearningParams', 'saved results'), ...
-    'Neurons_hidden' , 5,... % number of hidden units/neurons
+    'Neurons_hidden' , 8,... % number of hidden units/neurons
     'K_samples' , 20,... % number of samples for the Loss function of IWAE
-	'sigma_stim' ,rand(1) ,... % initialize pixelwise noise(sigma)
-	'prior' , .1+rand*.8,... % initialize the prior probability of spiking for neurons
-	'batch' , 100,... % size of batch of data to be trained on
+	'sigma_stim' ,0.5 ,... % initialize pixelwise noise(sigma)
+	'prior' , .2,... % initialize the prior probability of spiking for neurons
+	'batch' , 1000,... % size of batch of data to be trained on
     'pix' , 8,... % each RF and natural image patch is pix x pix size
     'tol' , 0.1,... % convergence of learning tolerence
-    'max_iter' , 10000,... % maximum number of iterations allowed for convergence
+    'max_iter' , 50,... % maximum number of iterations allowed for convergence
     'eta' , 0.5); % learning rate, used while updating parameters
-    params.G = randn(params.pix^2,params.Neurons_hidden); % initialize RFs, here size (pix*pix) x Neurons_hidden
+    %params.G = randn(params.pix^2,params.Neurons_hidden); % initialize RFs, here size (pix*pix) x Neurons_hidden
     % opening data file containg patches from natural images
     data = h5read(filename,'/patches');
     data = reshape(data,params.pix^2,params.batch); % data containing patches on which learning will be done
     params.data = transpose(data);
+for i=1:params.Neurons_hidden
+    tmp=zeros(8,8);
+    tmp(:,i)=1;
+    params.G(:,i)=tmp(:);
+end
 params.G = params.G ./ sqrt(sum(params.G.^2, 1));
 % Parse any extra (..., 'key', value, ...) pairs passed in through
 % varargin.
