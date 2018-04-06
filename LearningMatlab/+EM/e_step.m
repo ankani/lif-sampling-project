@@ -21,6 +21,7 @@ Q = params.N * (params.H * log(1 - params.prior) - params.pix * log(params.sigma
 
 log_prior = log(params.prior) - log(1 - params.prior);
 GG = reshape(params.G' * params.G, [params.H params.H 1]);
+dataG = data' * params.G;
 
 for n=1:params.N
     stim = data(:, n);
@@ -30,8 +31,7 @@ for n=1:params.N
     
     % Normalize p for the truncated set of states we are using. p is a column vector of
     % T probabilities
-    log_p = log_p - max(log_p);
-    p = exp(log_p(:));
+    p = exp(log_p(:) - max(log_p));
     p = p / sum(p);
     
     % zzT has size [H H T] and contains z*z' weighted by p for each of the T states
@@ -40,14 +40,15 @@ for n=1:params.N
     zzT = (z1 .* z2) .* reshape(p, [1 1 T]);
     
     % Compute expectations
-    mu_z = mu_z + z * p;
-    stim_mu = stim_mu + stim * mu_z';
-    stim_G_mu = stim_G_mu + stim' * params.G * mu_z;
+    mu = z * p; % mu for this data point only
+    mu_z = mu_z + mu;
+    stim_mu = stim_mu + stim * mu';
+    stim_G_mu = stim_G_mu + dataG(n, :) * mu;
     outer_z = outer_z + sum(zzT, 3);
     G_z = G_z + sum(sum(sum(GG .* zzT)));
     
     % Update Q with terms that depend on each data point
-    Q = Q + sum(mu_z) * log_prior - (stim'*stim - 2*stim_G_mu + G_z) / (2 * params.sigma^2);
+    Q = Q + sum(mu) * log_prior - (stim'*stim - 2*stim_G_mu + G_z) / (2 * params.sigma^2);
 end
 
 end
