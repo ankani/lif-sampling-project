@@ -12,23 +12,17 @@ for itr=1:params.max_iter
     iter_start = tic;
 
     % E Step
-    if params.debug, fprintf('%d\tE-Step\t', itr); end
+    if params.debug, fprintf('%d\tE-Step', itr); end
     [mu_z, stim_mu, stim_G_mu, outer_z, G_z, Q(itr)] = EM.e_step(params, data);
     
     % M Step
-    if params.debug, fprintf('M-Step\n'); end
+    if params.debug, fprintf('\tM-Step\n'); end
     params = EM.m_step(params, data_inner, mu_z, stim_mu, stim_G_mu, outer_z, G_z);
     
     % Diagnostics
     timing(itr) = toc(iter_start);
 
     if params.debug
-        % cla;
-        % plot(Q(1:itr), '-o');
-        % xlabel('iteration');
-        % ylabel('Q');
-        % drawnow;
-
         fprintf('\t%.2fs per iteration\n', mean(timing(1:itr)));
         fprintf('\tQ = %.2e\n', Q(itr));
     end
