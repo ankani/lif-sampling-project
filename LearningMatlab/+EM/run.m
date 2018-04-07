@@ -12,7 +12,7 @@ for itr=1:params.max_iter
     iter_start = tic;
 
     % E Step
-    if params.debug, fprintf('%d\tE-Step', itr); end
+    if params.debug, fprintf('%d/%d\tE-Step', itr, params.max_iter); end
     [mu_z, stim_mu, stim_G_mu, outer_z, G_z, Q(itr)] = EM.e_step(params, data);
     
     % M Step
