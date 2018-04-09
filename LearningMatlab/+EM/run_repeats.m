@@ -1,4 +1,4 @@
-function [best_params, fits, Qs] = run_repeats(params, data, repeats, init_method, max_retries)
+function [best_params, best_Q, fits, Qs] = run_repeats(params, data, repeats, init_method, max_retries)
 %EM.run_repeats re-initialize and re-fit multiple times and keep the best result.
 %
 % best_params = EM.run_repeats(params, data, repeats) re-initialize and re-fit 'repeats' times and
@@ -25,6 +25,7 @@ end
 Q_endpoints = cellfun(@max, Qs);
 [~, max_idx] = max(Q_endpoints);
 best_params = fits{max_idx};
+best_Q = Qs{max_idx};
 
 end
 
