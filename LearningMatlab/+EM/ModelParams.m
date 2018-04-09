@@ -9,7 +9,7 @@ params = struct(...
     ... % --- Model parameters ---
     'H', 16, ... % number of hidden units/neurons
     'sigma', .1, ... % pixelwise noise
-    'prior',  .01, ... % prior probability of spiking for neurons
+    'prior',  .1, ... % prior probability of spiking for neurons
     'size', [8 8], ... % [height width] of images
     ... % --- Data parameters ---
     'dataset', 'bars', ... % One of 'bars', 'rand', or a path to a '.h5' file generated from extract_vanhateren_to_bsc.py
