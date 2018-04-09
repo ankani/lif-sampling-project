@@ -17,11 +17,17 @@ for itr=1:params.max_iter
     if params.debug, fprintf('%d/%d\tE-Step', itr, params.max_iter); end
     [mu_z, stim_mu, outer_z, Q(itr)] = EM.e_step(params, data);
     
+    if isnan(Q(itr))
+        error('matlab:EM:run:diverged', 'Learning diverged! NaN value of Q');
+    end
+    
     % M Step
     if params.debug, fprintf('\tM-Step\n'); end
     params = EM.m_step(params, data_inner, mu_z, stim_mu, outer_z);
     
-    if nargout > 2, params_history(itr+1) = params; end
+    if nargout > 2
+        params_history(itr+1) = params;
+    end
     
     % Diagnostics
     timing(itr) = toc(iter_start);
