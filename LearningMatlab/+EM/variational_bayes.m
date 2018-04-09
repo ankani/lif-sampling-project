@@ -10,7 +10,7 @@ R = -(params.G' * params.G);
 mu = params.prior * ones(1,params.H);
 log_prior = log(params.prior) - log(1.0-params.prior);
 
-diff = inf;
+diff = 1e10;
 i = 1;
 while i < max_itrs && diff > epsilon
     mu_prev = mu;
