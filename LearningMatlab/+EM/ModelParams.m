@@ -11,6 +11,7 @@ params = struct(...
     'sigma', .1, ... % pixelwise noise
     'prior',  .1, ... % prior probability of spiking for neurons
     'size', [8 8], ... % [height width] of images
+    'fixed', {{}}, ... % Which, if any, parameters are 'fixed' and should not change
     ... % --- Data parameters ---
     'dataset', 'bars', ... % One of 'bars', 'rand', or a path to a '.h5' file generated from extract_vanhateren_to_bsc.py
     'N', 1000, ... % number of samples to generate (this is overwritten if an h5 file is given)

@@ -7,7 +7,8 @@
 params = ground_truth;
 params.sigma = 3;
 params.prior = .5;
-params.G = randn(size(ground_truth.G)) * std(ground_truth.G(:));
+params.fixed = {'G'};
+% params.G = randn(size(ground_truth.G)) * std(ground_truth.G(:));
 
 %% Run EM
 

@@ -43,7 +43,7 @@ else
         try
             init = EM.initialize(params, data, init_method);
             [fit, Q] = EM.run(init, data);
-            break;
+            return;
         catch
             warning('Run %d : attempt %d failed', idx, tries);
             tries = tries + 1;
@@ -52,8 +52,7 @@ else
                 fit.prior = nan;
                 fit.sigma = nan;
                 fit.G = nan(size(params.G));
-                Q = nan;
-                break;
+                return;
             end
         end
     end
