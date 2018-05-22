@@ -1,4 +1,4 @@
-function params = initialize(params, data, method)
+function params = initialize(params, data)
 
 % Ensure that params.pix matches size of data. If not, both params.pix and params.size must be
 % fixed.
@@ -16,7 +16,7 @@ scale = std(data(:));
 
 % Initialize projective fields
 if ~any(strcmpi('G', params.fixed))
-    switch method
+    switch lower(params.init_method)
         case 'pca'
             params.G = zeros(params.pix, params.H);
             C = cov(data');
@@ -37,8 +37,18 @@ if ~any(strcmpi('G', params.fixed))
             end
         case 'rand'
             params.G = randn(params.pix, params.H) * scale;
+        case 'orban'
+            orban_size = [16 16];
+            contents = load('OrbanPFs.mat');
+            A = contents.A;
+            params.G = zeros(params.pix, params.H);
+            h_idx = randperm(size(A, 2), params.H);
+            for h=1:params.H
+                scaled = imresize(reshape(A(:, h_idx(h)), orban_size), params.size, 'bicubic');
+                params.G(:, h) = scaled(:);
+            end
         otherwise
-            error('Method must be one of ''pca'' or ''rand''');
+            error('Method must be one of ''pca,'' ''orban,'' or ''rand''');
     end
 end
 
