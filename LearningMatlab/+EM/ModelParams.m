@@ -16,6 +16,8 @@ params = struct(...
     'dataset', 'bars', ... % One of 'bars', 'rand', or a path to a '.h5' file generated from extract_vanhateren_to_bsc.py
     'N', 1000, ... % number of samples to generate (this is overwritten if an h5 file is given)
     ... % --- EM parameters ---
+    'anneal_init', 100, ... % Initial temperature for annealing. A value of 1 does no annealing
+    'anneal_decay', .5, ... % Every epoch, decay temperature towards 1 at this rate
     'debug', false, ... % flag whether to print / plot diagnostic information as EM is running
     'truncate', 10, ... % expectation truncation with up to 'truncate' ones in any state
     'tol',  1e-9, ... % tolerance of change in parameters defining convergence

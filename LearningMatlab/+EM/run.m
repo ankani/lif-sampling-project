@@ -8,6 +8,9 @@ timing = zeros(params.max_iter);
 
 if nargout > 2, params_history = params; end
 
+T = params.anneal_init;
+params.sigma = T * params.sigma;
+
 for itr=1:params.max_iter
     prev_params = params;
     
@@ -24,6 +27,7 @@ for itr=1:params.max_iter
     % M Step
     if params.debug, fprintf('\tM-Step\n'); end
     params = EM.m_step(params, data_inner, mu_z, stim_mu, outer_z);
+    params.sigma = T * params.sigma;
     
     if nargout > 2
         params_history(itr+1) = params;
@@ -45,7 +49,13 @@ for itr=1:params.max_iter
     if all([prior_diff sigma_diff G_diff] < params.tol)
         break;
     end
+    
+    % Update annealing
+    T = 1 + (T - 1) * params.anneal_decay;
 end
+
+% Once converged, undo scaling of sigma by T.
+params.sigma = params.sigma / T;
 
 [~, ~, ~, Q(itr+1)] = EM.e_step(params, data);
 Q(itr+2:end) = [];
