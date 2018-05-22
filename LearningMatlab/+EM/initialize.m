@@ -4,9 +4,12 @@ function params = initialize(params, data, method)
 % fixed.
 assert(params.pix == size(data, 1));
 
-% When prior is too extreme, learning is slower. Initialize randomly between .2 and .8
+% When prior is too extreme, learning is slower. Initialize randomly between .001 and .1
 if ~any(strcmpi('prior', params.fixed))
-    params.prior = .2 + rand * .6;
+    log_lower = log(.001);
+    log_upper = log(.1);
+    u = rand * (log_upper - log_lower) + log_lower;
+    params.prior = exp(u);
 end
 
 scale = std(data(:));
@@ -39,12 +42,13 @@ if ~any(strcmpi('G', params.fixed))
     end
 end
 
-% Initialize pixel noise based on residuals from projective fields
+% Initialize pixel noise based on residuals from projective fields, times a factor of 10 because it
+% helps convergence to over-estimate at the beginning
 if ~any(strcmpi('sigma', params.fixed))
     bestfit = pinv(params.G) * data;
     errors = data - params.G * bestfit;
-    sigma2 = mean(sum(errors.^2, 1));
-    params.sigma = sqrt(sigma2);
+    sigma2 = .1 + mean(sum(errors.^2, 1));
+    params.sigma = 10 * sqrt(sigma2);
 end
 
 end
