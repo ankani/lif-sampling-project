@@ -4,6 +4,8 @@
 
 %% Initialize parameters to be learned
 
+[~, ~, ~, Q_ground_truth] = EM.e_step(ground_truth, data);
+
 params = ground_truth;
 params.sigma = 3;
 params.prior = .5;
@@ -21,7 +23,10 @@ figure;
 
 % Q should have increased monotonically
 subplot(1, 3, 1);
+hold on;
 plot(Q);
+xl = xlim;
+plot(xl, [Q_ground_truth Q_ground_truth], '--k');
 xlabel('iteration');
 ylabel('Q');
 
