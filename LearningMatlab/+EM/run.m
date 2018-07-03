@@ -30,7 +30,7 @@ for itr=1:params.max_iter
     end
     
     % M Step
-    params = EM.m_step(params, data_inner, mu_z, stim_mu, outer_z);
+    params = EM.m_step(params, data_inner, mu_z, stim_mu, outer_z, T / 100);
     deltaParams = deltaStruct(params, prev_params, {'sigma', 'prior', 'G'});
     params.sigma = T * params.sigma;
     

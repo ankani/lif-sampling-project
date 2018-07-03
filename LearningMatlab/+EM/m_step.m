@@ -1,4 +1,4 @@
-function params = m_step(params, data_inner, mu_z, stim_mu, outer_z)
+function params = m_step(params, data_inner, mu_z, stim_mu, outer_z, anneal)
 %EM.M_STEP using the expectations computed in EM.e_step, compute updated model parameters that
 %maximize the EM objective.
 
@@ -10,7 +10,7 @@ end
 
 % Update projective fields (note: this must happen before updating sigma since sigma depends on G)
 if ~any(strcmpi('G', params.fixed))
-    params.G = stim_mu / outer_z;
+    params.G = stim_mu / (outer_z + anneal * eye(size(outer_z)));
 end
 GG = params.G' * params.G;
 
