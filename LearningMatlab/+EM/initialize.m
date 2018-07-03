@@ -6,8 +6,8 @@ assert(params.pix == size(data, 1));
 
 % When prior is too extreme, learning is slower. Initialize randomly between .001 and .1
 if ~any(strcmpi('prior', params.fixed))
-    log_lower = log(.001);
-    log_upper = log(.1);
+    log_lower = log(.0001);
+    log_upper = log(.01);
     u = rand * (log_upper - log_lower) + log_lower;
     params.prior = exp(u);
 end

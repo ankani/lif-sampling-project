@@ -9,7 +9,7 @@ params = struct(...
     ... % --- Model parameters ---
     'H', 16, ... % number of hidden units/neurons
     'sigma', .1, ... % pixelwise noise
-    'prior',  .1, ... % prior probability of spiking for neurons
+    'prior',  .001, ... % prior probability of spiking for neurons
     'size', [8 8], ... % [height width] of images
     'fixed', {{}}, ... % Which, if any, parameters are 'fixed' and should not change
     ... % --- Data parameters ---
@@ -21,7 +21,7 @@ params = struct(...
     'anneal_decay', .5, ... % Every epoch, decay temperature towards 1 at this rate
     'debug', false, ... % flag whether to print / plot diagnostic information as EM is running
     'truncate', 10, ... % expectation truncation with up to 'truncate' ones in any state
-    'tol',  1e-9, ... % tolerance of change in parameters defining convergence
+    'tol',  1e-5, ... % tolerance of change in parameters defining convergence
     'max_iter',  300); % maximum number of iterations allowed for convergence
 
 %% Parse any extra (..., 'key', value, ...) pairs passed in through varargin.
@@ -77,8 +77,8 @@ switch params.dataset
         [n, h, w] = size(data);
         data = reshape(data, n, h*w)';
         
-        % Preprocess data: subtract mean and normalize
-        data = (data - mean(data(:))) / std(data(:));
+        % Preprocess data: normalize luminance range.
+        data = data / std(data(:));
         
         % Override params
         params.N = n;
