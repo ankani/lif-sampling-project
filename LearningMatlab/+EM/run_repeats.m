@@ -40,6 +40,7 @@ else
         try
             init = EM.initialize(params, data);
             [fit, Q] = EM.run(init, data);
+            save(savename, 'fit', 'Q');
             return;
         catch
             warning('Run %d : attempt %d failed', idx, tries);
@@ -53,7 +54,6 @@ else
             end
         end
     end
-    save(savename, 'fit', 'Q');
 end
 
 end
