@@ -7,7 +7,7 @@ import numpy as np
 from sys import argv, exit
 
 if len(argv) < 2:
-    print("Usage: python extract_vanhateren_to_bsc.py path/to/vanhateren_iml/ [npatches] [patchsize]")
+    print("Usage: python extract_vanhateren_to_bsc.py path/to/vanhateren_iml/ [npatches] [patchsize] [dest]")
     exit(1)
 
 images_dataset = argv[1]
@@ -18,7 +18,7 @@ im_dtype = 'uint16'
 n_patches = 10000 if len(argv) < 2 else int(argv[2])
 size = 32 if len(argv) < 3 else int(argv[3])
 patch_size = (size, size)
-dest_name = "patches_%dx%d_%d" % (patch_size + (n_patches,))
+dest_name = "patches_%dx%d_%d" % (patch_size + (n_patches,)) if len(argv) < 5 else argv[4]
 dest_file = h5.File(dest_name + ".tmp.h5", "w")
 
 idxs = np.zeros(shape=(n_patches, 3), dtype='int32')
