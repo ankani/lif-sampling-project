@@ -11,22 +11,27 @@ if nargout > 2, params_history = params; end
 T = params.anneal_init;
 params.sigma = T * params.sigma;
 
+lastQ = -inf;
+
 for itr=1:params.max_iter
     prev_params = params;
     
     iter_start = tic;
 
     % E Step
-    if params.debug, fprintf('%d/%d\tE-Step', itr, params.max_iter); end
+    if params.debug, fprintf('%d/%d\t', itr, params.max_iter); end
     [mu_z, stim_mu, outer_z, Q(itr)] = EM.e_step(params, data);
+    
+    deltaQ = Q(itr) - lastQ;
+    lastQ = Q(itr);
     
     if isnan(Q(itr))
         error('matlab:EM:run:diverged', 'Learning diverged! NaN value of Q');
     end
     
     % M Step
-    if params.debug, fprintf('\tM-Step\n'); end
     params = EM.m_step(params, data_inner, mu_z, stim_mu, outer_z);
+    deltaParams = deltaStruct(params, prev_params, {'sigma', 'prior', 'G'});
     params.sigma = T * params.sigma;
     
     if nargout > 2
@@ -37,16 +42,14 @@ for itr=1:params.max_iter
     timing(itr) = toc(iter_start);
 
     if params.debug
+        fprintf('\tQ = %.2e', Q(itr));
+        fprintf('\tdQ = %.2e', deltaQ);
+        fprintf('\tdParams = %.2e', deltaParams);
         fprintf('\t%.2fs per iteration\n', mean(timing(1:itr)));
-        fprintf('\tQ = %.2e\n', Q(itr));
     end
     
     % Check for convergence
-    prior_diff = abs(params.prior - prev_params.prior);
-    sigma_diff = abs(params.sigma - prev_params.sigma);
-    G_diff = max(abs(params.G(:) - prev_params.G(:)));
-    
-    if all([prior_diff sigma_diff G_diff] < params.tol)
+    if deltaParams < params.tol
         break;
     end
     
@@ -60,4 +63,13 @@ params.sigma = params.sigma / T;
 [~, ~, ~, Q(itr+1)] = EM.e_step(params, data);
 Q(itr+2:end) = [];
 
+end
+
+function delta = deltaStruct(s1, s2, fields)
+delta2 = 0;
+for iField = 1:length(fields)
+    deltaField = s1.(fields{iField}) - s2.(fields{iField});
+    delta2 = delta2 + sum(deltaField(:).^2);
+end
+delta = sqrt(delta2);
 end
