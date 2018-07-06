@@ -7,7 +7,7 @@ if nargin < 4, max_itrs = 1000; end
 stim = stim(:);
 feedforward = stim' * params.G;
 R = -(params.G' * params.G);
-mu = params.prior * ones(1,params.H);
+mu = 1 ./ (1 + params.prior * exp(-feedforward));
 log_prior = log(params.prior) - log(1.0-params.prior);
 
 diff = 1e10;
@@ -25,6 +25,6 @@ while i < max_itrs && diff > epsilon
 end
 
 if i >= max_itrs
-    warning('Max VB iterations reached before convergence');
+    warning('Max VB iterations reached before convergence; diff = %.3e', diff);
 end
 end
