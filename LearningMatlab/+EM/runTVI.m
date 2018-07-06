@@ -73,7 +73,7 @@ for itr=1:params.max_iter
     end
     
     % Check for convergence
-    if deltaParams < params.tol || deltaQ < 0
+    if deltaParams < params.tol
         break;
     end
     
