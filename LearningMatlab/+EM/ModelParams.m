@@ -20,7 +20,8 @@ params = struct(...
     'anneal_init', 100, ... % Initial temperature for annealing. A value of 1 does no annealing
     'anneal_decay', .5, ... % Every epoch, decay temperature towards 1 at this rate
     'debug', false, ... % flag whether to print / plot diagnostic information as EM is running
-    'truncate', 10, ... % expectation truncation with up to 'truncate' ones in any state
+    'truncate', 10, ... % expectation truncation with up to 'truncate' ones in any state (during TVI, this becomes the number of new samples to propose each iteration)
+    'tvi_samples', 512, ... % number of new samples to propose in each step of TVI (not used in EM)
     'tol',  1e-5, ... % tolerance of change in parameters defining convergence
     'max_iter',  300); % maximum number of iterations allowed for convergence
 
@@ -86,6 +87,18 @@ switch params.dataset
         params.pix = h * w;
         % Initialize projective fields
         params = EM.initialize(params, data);
+end
+
+%% Sanity checks
+
+if params.tvi_samples > 2^params.H
+    warning('Limiting params.tvi_samples to 2^params.H');
+    params.tvi_samples = 2^params.H;
+end
+
+if params.truncate > params.H
+    warning('Limiting params.truncate to params.H');
+    params.tvi_samples = params.H;
 end
 
 end
