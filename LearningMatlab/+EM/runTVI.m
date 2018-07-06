@@ -21,11 +21,11 @@ lastQ = -inf;
 % Initialize samples
 samplesSet = zeros(params.N, params.H, params.tvi_samples);
 samplesPosteriors = zeros(params.N, params.tvi_samples);
-params.trunctate = ceil(log2(params.tvi_samples));
+params.truncate = ceil(log2(params.tvi_samples));
 for n=1:params.N
     stim = data(:, n);
     z_trunc = EM.truncate(params, stim)';
-    % By setting params.trunctate to ceil(log2(tvi_samples)), params.tvi_samples is smaller than (or
+    % By setting params.truncate to ceil(log2(tvi_samples)), params.tvi_samples is smaller than (or
     % equal to) what we got from truncate(); keep only the top values
     posteriors = EM.log_joint(params, stim, z_trunc);
     [~, sort_idx] = sort(posteriors, 'descend');
