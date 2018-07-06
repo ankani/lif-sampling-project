@@ -20,8 +20,9 @@ params = struct(...
     'anneal_init', 100, ... % Initial temperature for annealing. A value of 1 does no annealing
     'anneal_decay', .5, ... % Every epoch, decay temperature towards 1 at this rate
     'debug', false, ... % flag whether to print / plot diagnostic information as EM is running
-    'truncate', 10, ... % expectation truncation with up to 'truncate' ones in any state (during TVI, this becomes the number of new samples to propose each iteration)
+    'truncate', 10, ... % expectation truncation with up to 'truncate' ones in any state
     'tvi_samples', 512, ... % number of new samples to propose in each step of TVI (not used in EM)
+    'tvi_propose', 100, ... % in TVI, the number of new samples to propose each iteration
     'tol',  1e-5, ... % tolerance of change in parameters defining convergence
     'max_iter',  300); % maximum number of iterations allowed for convergence
 

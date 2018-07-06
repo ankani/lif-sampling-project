@@ -1,4 +1,5 @@
-function [mu_z, stim_mu, outer_z, Q, z_samples, z_posteriors] = e_step_tvi(params, data, z_samples, z_posteriors)
+function [mu_z, stim_mu, outer_z, Q, z_samples, z_posteriors, num_new_samples] = ...
+    e_step_tvi(params, data, z_samples, z_posteriors)
 %EM.E_STEP_TVI propose new samples of z and compute relevant expectations of z with respect to the
 %given data and new set of samples. Also compute value of EM objective 'Q'
 %
@@ -21,11 +22,13 @@ Q = params.N * (H * log(1 - params.prior) - P * log(params.sigma) - log(2*pi) / 
 GG = params.G' * params.G;
 log_prior = log(params.prior) - log(1 - params.prior);
 
+num_new_samples = zeros(params.N, 1);
+
 for n=1:params.N
     %% Propose new samples of z(n, :) using VB estimate of marginals
     stim = data(:, n);
     marginals = EM.variational_bayes(params, stim, 1e-6);
-    new_samples = rand(1, params.H, params.truncate) < reshape(marginals, 1, params.H, 1);
+    new_samples = rand(1, params.H, params.tvi_propose) < reshape(marginals, 1, params.H, 1);
     new_posteriors = EM.log_joint(params, stim, squeeze(new_samples));
     
     % Keep best (unique) samples only
@@ -37,6 +40,10 @@ for n=1:params.N
     [~, sort_idx] = sort(all_posteriors, 'descend');
     z_samples(n, :, :) = all_samples(:, :, sort_idx(1:params.tvi_samples));
     z_posteriors(n, :) = all_posteriors(sort_idx(1:params.tvi_samples));
+    
+    % Count number of 'new' samples; these are any samples in the 'tail' that have been sorted to
+    % now be among the top tvi_samples
+    num_new_samples(n) = sum(sort_idx(params.tvi_samples+1:end) <= params.tvi_samples);
     
     %% Compute expectations
 

@@ -42,7 +42,7 @@ for itr=1:params.max_iter
 
     % E Step
     if params.debug, fprintf('%d/%d\t', itr, params.max_iter); end
-    [mu_z, stim_mu, outer_z, Q(itr), samplesSet, samplesPosteriors] = ...
+    [mu_z, stim_mu, outer_z, Q(itr), samplesSet, samplesPosteriors, new_samples] = ...
         EM.e_step_tvi(params, data, samplesSet, samplesPosteriors);
     
     deltaQ = Q(itr) - lastQ;
@@ -68,6 +68,7 @@ for itr=1:params.max_iter
         fprintf('\tQ = %.2e', Q(itr));
         fprintf('\tdQ = %.2e', deltaQ);
         fprintf('\tdParams = %.2e', deltaParams);
+        fprintf('\t%.2f +/- %.2f samples/datapt changed', mean(new_samples), std(new_samples));
         fprintf('\t%.2fs per iteration\n', mean(timing(1:itr)));
     end
     
